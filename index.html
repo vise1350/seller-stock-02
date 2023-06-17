@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sellers Stock</title>
+</head>
+<body>
+    <form onsubmit="saveData(event)">
+
+   
+    <label > Item Name </label>
+    <input type="text" name="item" id="nameid" required/>
+    <label > Selling price </label>
+    <input type="number" name="price" id="priceid" required/>
+    <button>Submit </button>
+
+</form>
+<ul id="ListOfItems"></ul>
+<p id="para"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+
+<script>
+
+
+function saveData(event){
+    event.preventDefault();
+    
+    const val= event.target.item.value;
+    const price=event.target.price.value;
+
+
+    const obj={
+        
+        val,
+        price}
+
+        console.log(obj)
+
+        axios.post("https://crudcrud.com/api/7dfe14bf48cf4aba88a955fb0fc25724/myStocks",obj)
+            .then((response)=>{
+                console.log(response)
+            })
+            .catch((error)=>{
+                console.log(error)
+            })
+    
+    // localStorage.setItem(obj.val,JSON.stringify(obj))
+    showUserOnScreen(obj)
+        }
+
+    addEventListener("DOMContentLoaded", (event) => {
+
+        axios.get("https://crudcrud.com/api/7dfe14bf48cf4aba88a955fb0fc25724/myStocks")
+            .then((response)=>{
+
+            
+                // console.log("content loaded")
+                // 
+                let sum=0
+                for(let i =0;i<response.data.length;i++){
+                    showUserOnScreen(response.data[i])
+                    // console.log(typeof(response.data[i].price))
+                    let total= parseInt(response.data[i].price)
+                    sum=sum+total
+                    // console.log(typeof(total))
+                
+                }
+                console.log(sum)
+                const para=document.getElementById("para")
+                para.innerHTML=`Total value of the stocks is ${sum}`
+                // const childNode=document.createElement("li")
+                // childNode.textContent=`the total value of your cart is ${sum}`
+                // para.appendChild(childNode)
+
+
+            })
+            .catch((error)=>{
+            console.log(error)
+
+        })
+         
+            
+        })
+
+
+
+    function showUserOnScreen(obj){
+        const parentElem=document.getElementById("ListOfItems")
+        const childHTML = `<li id=${obj._id}> ${obj.val} - ${obj.price}
+
+            <button onclick=deleteUser('${obj._id}')> Delete User </button> 
+            </li>`
+
+            parentElem.innerHTML=parentElem.innerHTML+childHTML
+
+        }
+    function deleteUser(userId){
+        axios.delete(`https://crudcrud.com/api/7dfe14bf48cf4aba88a955fb0fc25724/myStocks/${userId}`)
+            .then((response)=>{
+                removeUserFromScreen(userId)
+                // console.log(response)
+            })
+            .catch((error)=>{
+                console.log(error)
+            })
+
+
+    }
+
+    function removeUserFromScreen(userId){
+        const parentElem=document.getElementById('ListOfItems')
+        const childNode=document.getElementById(userId)
+        if(childNode){
+            parentElem.removeChild(childNode)
+        }
+        
+      
+
+    }
+
+</script> 
+
+    
+</body>
+</html>
